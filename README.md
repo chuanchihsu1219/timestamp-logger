@@ -4,14 +4,14 @@
 
 ## Overview
 
-This is a lightweight, user-friendly timestamp logging tool designed for real-world data collection tasks. Originally developed for a fieldwork assignment in the *Operations Research* course at National Taiwan University, the app was used to record human flow observations at Taipei 101 — a high-traffic area requiring precise and rapid logging.
+This is a lightweight, user-friendly timestamp logging tool designed for real-world data collection tasks. Originally developed for a fieldwork assignment in the Operations Research course at National Taiwan University, the app was used to record human flow observations at Taipei 101.
 
 Unlike existing timestamp tools that are often either overcomplicated or lack flexibility, this project focuses on:
 
 * 👆 **Instant, easy one-click logging**
 * 🧼 **Clean, distraction-free interface**
 * 🧾 **Export logs in CSV with a single click**
-* 💾 \*\*Persistent local storage using \*\***`localStorage`**
+* 💾 **Persistent local storage using `localStorage`**
 * 🔄 **Automatic session recovery for seamless re-entry**
 
 ## Motivation
