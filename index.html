@@ -1,145 +1,311 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Timestamp Logger</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      font-family: sans-serif;
-      background: #f4f4f4;
-    }
-    .screen { display: none; height: 100%; }
-    .active { display: flex; flex-direction: column; height: 100%; }
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Timestamp Logger</title>
+        <style>
+            /* 改進整體樣式 */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+            }
+            .screen {
+                background: linear-gradient(135deg, #3498db, #2ecc71);
+            }
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                font-family: "Arial", sans-serif;
+                background: linear-gradient(135deg, #3498db, #2ecc71);
+                color: #333;
+            }
 
-    #setupScreen, #logScreen {
-      padding: 1em;
-      box-sizing: border-box;
-    }
+            /* 屏幕樣式 */
+            .screen {
+                display: none;
+                height: 100vh;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+            }
+            .active {
+                display: flex;
+            }
 
-    #logScreen h2 {
-      margin: 0.5em 0;
-    }
+            .topBar {
+              display: flex;
+              justify-content: space-between; /* 左右分散 */
+              align-items: center;            /* 垂直置中對齊 */
+              width: 100%;
+              box-sizing: border-box;
+            }
 
-    #logList {
-      flex: 1;
-      overflow-y: auto;
-      background: #fff;
-      padding: 1em;
-      border: 1px solid #ccc;
-      margin-top: 1em;
-      margin-bottom: 2em;
-    }
+            /* 設置屏幕 */
+            #setupScreen {
+                border-radius: 10px;
+                padding: 2em;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
 
-    #logButton {
-      width: 280px; height: 280px; border-radius: 140px;
-      background-color: #3498db; color: white; font-size: 24px; border: none;
-      margin: 1em auto 2em auto;
-      flex-shrink: 0;
-    }
+            h2 {
+                color: #fff;
+                font-size: 24px;
+                text-align: center;
+                margin-bottom: 1em;
+            }
 
-    #exportBtn {
-      position: fixed; top: 1em; left: 1em;
-      background: #2ecc71; color: white; border: none; padding: 10px;
-      font-weight: bold;
-    }
+            /* 日誌屏幕 */
+            #logScreen {
+                padding: 1em;
+                box-sizing: border-box;
+            }
 
-    input {
-      font-size: 18px;
-      padding: 10px;
-      width: 80%;
-    }
+            #title {
+                color: #fff;
+                font-size: 24px;
+                font-weight: bold;
+                text-align: center;
+                margin-bottom: 1em;
+            }
 
-    button {
-      font-size: 18px;
-      padding: 10px 20px;
-    }
-  </style>
-</head>
-<body>
-  <div id="setupScreen" class="screen active">
-    <h2>輸入活動名稱</h2>
-    <input id="eventName" placeholder="例如：101人流觀察"><br><br>
-    <button onclick="startLogging()">開始紀錄</button>
-  </div>
+            #logTitle {
+                font-size: 18px;
+                font-weight: bold;
+                color: white;
+                margin-bottom: 1em;
+                text-align: left;
+            }
 
-  <div id="logScreen" class="screen">
-    <button id="exportBtn" onclick="exportCSV()">匯出</button>
-    <h2 id="title"></h2>
-    <div id="logList"></div>
-    <button id="logButton" onclick="logTimestamp()">打點</button>
-  </div>
+            /* 日誌列表 */
+            #logList {
+                flex: 1;
+                overflow-y: auto;
+                background: white;
+                padding: 1em;
+                border: 16px solid white;
+                margin: 1em auto 1em auto;
+                border-radius: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                font-size: 16px;
+                line-height: 1.5;
+                color: #333;
+                width: 280px;
+                max-width: 800px;
+                text-align: center;
+                scroll-padding-top: 2em;
+            }
 
-  <script>
-    let timestamps = [];
-    let eventName = "";
+            #logList b {
+                font-size: 18px;
+                color: #2c3e50;
+            }
 
-    function startLogging() {
-      eventName = document.getElementById("eventName").value || "Event";
-      document.getElementById("setupScreen").classList.remove("active");
-      document.getElementById("logScreen").classList.add("active");
-      document.getElementById("title").innerText = eventName;
+            #logList::-webkit-scrollbar {
+                width: 8px;
+            }
 
-      const saved = localStorage.getItem("timestamps");
-      if (saved) {
-        timestamps = JSON.parse(saved);
-        updateLogList();
-      }
-    }
+            #logList::-webkit-scrollbar-thumb {
+                background-color: #3498db;
+                border-radius: 4px;
+            }
 
-    function logTimestamp() {
-      const now = new Date();
-      const timestamp = formatDateTime(now);
-      timestamps.push(timestamp);
-      localStorage.setItem("timestamps", JSON.stringify(timestamps));
-      updateLogList();
-    }
+            /* 按鈕樣式 */
+            button {
+                font-size: 18px;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                background-color: white;
+                transition: background-color 0.3s ease;
+            }
 
-    function formatDateTime(date) {
-      const pad = n => n.toString().padStart(2, '0');
-      const y = date.getFullYear();
-      const m = pad(date.getMonth() + 1);
-      const d = pad(date.getDate());
-      const h = pad(date.getHours());
-      const min = pad(date.getMinutes());
-      const s = pad(date.getSeconds());
-      const ms = date.getMilliseconds().toString().padStart(3, '0');
-      return `${y}-${m}-${d} ${h}:${min}:${s}.${ms}`;
-    }
+            button:hover {
+                background-color: #2980b9;
+                color: #fff;
+            }
 
-    function updateLogList() {
-      const div = document.getElementById("logList");
-      div.innerHTML = "<b>已紀錄時間：</b><br>" + timestamps.map(t => `- ${t}`).join("<br>");
-      div.scrollTop = div.scrollHeight;
-    }
+            #logButton {
+                width: 280px;
+                height: 280px;
+                border-radius: 140px;
+                background-color: #3498db;
+                color: white;
+                font-size: 24px;
+                font-weight: bold;
+                border: none;
+                margin: 1em auto 2em auto;
+                flex-shrink: 0;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
 
-    function exportCSV() {
-      const header = "Timestamp\n";
-      const body = timestamps.join("\n");
-      const content = header + body;
+            #logButton:hover {
+                background-color: #2980b9;
+            }
 
-      const now = new Date();
-      const formattedDate = formatDateTime(now).replace(/[: ]/g, "-");
-      const filename = `${eventName}_${formattedDate}.csv`;
+            #exportBtn, #clearBtn {
+              background: #2ecc71;
+              color: white;
+              border: none;
+              padding: 10px 16px;
+              font-weight: bold;
+              border-radius: 5px;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+              margin: 0 8px;
+            }
+            
+            #clearBtn {
+              background: #cc2e50;
+            }
+            
+            #exportBtn:hover {
+              background-color: #27ae60;
+            }
+            #clearBtn:hover {
+              background-color: #a5283e;
+            }
+            
+            #title {
+              color: #fff;
+              font-size: 24px;
+              font-weight: bold;
+              text-align: center;
+              flex-grow: 1;
+            }
 
-      const blob = new Blob([content], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.click();
+            /* 輸入框樣式 */
+            input {
+                font-size: 18px;
+                padding: 10px;
+                width: 80%;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
 
-      localStorage.removeItem("timestamps");
-      timestamps = [];
-      updateLogList();
-    }
+            input:focus {
+                outline: none;
+                border-color: #3498db;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="setupScreen" class="screen active">
+            <h2>輸入活動名稱</h2>
+            <input id="eventName" placeholder="例如：101人流觀察" /><br /><br />
+            <button onclick="startLogging()">開始紀錄</button>
+        </div>
 
-    window.onbeforeunload = function () {
-      if (timestamps.length > 0) return "你尚未匯出資料，確定要離開？";
-    }
-  </script>
-</body>
+        <div id="logScreen" class="screen">
+            <div class="topBar">
+              <button id="exportBtn" onclick="exportCSV()">匯出</button>
+              <h2 id="title"></h2>
+              <button id="clearBtn" onclick="clearData()">清除</button>
+            </div>
+            <div id="logList"></div>
+            <button id="logButton" onclick="logTimestamp()">打點</button>
+        </div>
+
+        <script>
+            let timestamps = [];
+            let eventName = "";
+
+            window.onload = function () {
+                const savedEventName = localStorage.getItem("eventName");
+                const savedTimestamps = localStorage.getItem("timestamps");
+
+                if (savedEventName && savedTimestamps) {
+                    eventName = savedEventName;
+                    timestamps = JSON.parse(savedTimestamps);
+                    document.getElementById("setupScreen").classList.remove("active");
+                    document.getElementById("logScreen").classList.add("active");
+                    document.getElementById("title").innerText = eventName;
+                    updateLogList();
+                }
+            };
+
+            function startLogging() {
+                eventName = document.getElementById("eventName").value || "Event";
+                localStorage.setItem("eventName", eventName);
+                document.getElementById("setupScreen").classList.remove("active");
+                document.getElementById("logScreen").classList.add("active");
+                document.getElementById("title").innerText = eventName;
+
+                const saved = localStorage.getItem("timestamps");
+                if (saved) {
+                    timestamps = JSON.parse(saved);
+                    updateLogList();
+                }
+            }
+
+            function logTimestamp() {
+                const now = new Date();
+                const timestamp = formatDateTime(now);
+                timestamps.push(timestamp);
+                localStorage.setItem("timestamps", JSON.stringify(timestamps));
+                updateLogList();
+            }
+
+            function formatDateTime(date) {
+                const pad = (n) => n.toString().padStart(2, "0");
+                const y = date.getFullYear();
+                const m = pad(date.getMonth() + 1);
+                const d = pad(date.getDate());
+                const h = pad(date.getHours());
+                const min = pad(date.getMinutes());
+                const s = pad(date.getSeconds());
+                const ms = date.getMilliseconds().toString().padStart(3, "0");
+                return `${y}-${m}-${d} ${h}:${min}:${s}.${ms}`;
+            }
+
+            function updateLogList() {
+                const div = document.getElementById("logList");
+                div.innerHTML = timestamps.join("<br>");
+                div.scrollTop = div.scrollHeight;
+            }
+
+            function exportCSV() {
+                const header = "Timestamp\n";
+                const body = timestamps.join("\n");
+                const content = header + body;
+
+                const now = new Date();
+                const formattedDate = formatDateTime(now).replace(/[: ]/g, "-");
+                const filename = `${eventName}_${formattedDate}.csv`;
+
+                const blob = new Blob([content], { type: "text/csv" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = filename;
+                a.click();
+
+                localStorage.removeItem("timestamps");
+                timestamps = [];
+                updateLogList();
+            }
+
+            function clearData() {
+                const userConfirmed = window.confirm("確定要清除所有記錄並回到設定頁面嗎？");
+                if (userConfirmed) {
+                    localStorage.removeItem("eventName");
+                    localStorage.removeItem("timestamps");
+                    timestamps = [];
+                    eventName = "";
+                    document.getElementById("logScreen").classList.remove("active");
+                    document.getElementById("setupScreen").classList.add("active");
+                    document.getElementById("eventName").value = "";
+                    updateLogList();
+                }
+            }
+
+            window.onbeforeunload = function () {
+                if (timestamps.length > 0) return "你尚未匯出資料，確定要離開？";
+            };
+        </script>
+    </body>
 </html>
