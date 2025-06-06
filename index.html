@@ -70,6 +70,7 @@
                 font-weight: bold;
                 text-align: center;
                 margin-bottom: 1em;
+                flex-grow: 1;
             }
 
             #logTitle {
@@ -115,7 +116,7 @@
 
             /* 按鈕樣式 */
             button {
-                font-size: 18px;
+                font-size: 14px;
                 padding: 10px 20px;
                 border: none;
                 border-radius: 5px;
@@ -169,14 +170,6 @@
               background-color: #a5283e;
             }
             
-            #title {
-              color: #fff;
-              font-size: 24px;
-              font-weight: bold;
-              text-align: center;
-              flex-grow: 1;
-            }
-
             /* 輸入框樣式 */
             input {
                 font-size: 18px;
@@ -195,19 +188,19 @@
     </head>
     <body>
         <div id="setupScreen" class="screen active">
-            <h2>輸入活動名稱</h2>
-            <input id="eventName" placeholder="例如：101人流觀察" /><br /><br />
-            <button onclick="startLogging()">開始紀錄</button>
+            <h2>Enter Event Name</h2>
+            <input id="eventName" placeholder="e.g., 101 People Flow Observation" /><br /><br />
+            <button onclick="startLogging()">Start Logging</button>
         </div>
 
         <div id="logScreen" class="screen">
             <div class="topBar">
-              <button id="exportBtn" onclick="exportCSV()">匯出</button>
+              <button id="exportBtn" onclick="exportCSV()">Export</button>
               <h2 id="title"></h2>
-              <button id="clearBtn" onclick="clearData()">清除</button>
+              <button id="clearBtn" onclick="clearData()">Clear</button>
             </div>
             <div id="logList"></div>
-            <button id="logButton" onclick="logTimestamp()">打點</button>
+            <button id="logButton" onclick="logTimestamp()">Log</button>
         </div>
 
         <script>
@@ -290,7 +283,7 @@
             }
 
             function clearData() {
-                const userConfirmed = window.confirm("確定要清除所有記錄並回到設定頁面嗎？");
+                const userConfirmed = window.confirm("Are you sure you want to clear all records and return to the setup page?");
                 if (userConfirmed) {
                     localStorage.removeItem("eventName");
                     localStorage.removeItem("timestamps");
@@ -304,7 +297,7 @@
             }
 
             window.onbeforeunload = function () {
-                if (timestamps.length > 0) return "你尚未匯出資料，確定要離開？";
+                if (timestamps.length > 0) return "You have unsaved data. Are you sure you want to leave?";
             };
         </script>
     </body>
