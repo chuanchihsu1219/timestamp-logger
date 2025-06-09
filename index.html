@@ -37,11 +37,11 @@
             }
 
             .topBar {
-              display: flex;
-              justify-content: space-between; /* 左右分散 */
-              align-items: center;            /* 垂直置中對齊 */
-              width: 100%;
-              box-sizing: border-box;
+                display: flex;
+                justify-content: space-between; /* 左右分散 */
+                align-items: center; /* 垂直置中對齊 */
+                width: 100%;
+                box-sizing: border-box;
             }
 
             /* 設置屏幕 */
@@ -148,28 +148,29 @@
                 background-color: #2980b9;
             }
 
-            #exportBtn, #clearBtn {
-              background: #2ecc71;
-              color: white;
-              border: none;
-              padding: 10px 16px;
-              font-weight: bold;
-              border-radius: 5px;
-              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-              margin: 0 8px;
-            }
-            
+            #exportBtn,
             #clearBtn {
-              background: #cc2e50;
+                background: #2ecc71;
+                color: white;
+                border: none;
+                padding: 10px 16px;
+                font-weight: bold;
+                border-radius: 5px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                margin: 0 8px;
             }
-            
+
+            #clearBtn {
+                background: #cc2e50;
+            }
+
             #exportBtn:hover {
-              background-color: #27ae60;
+                background-color: #27ae60;
             }
             #clearBtn:hover {
-              background-color: #a5283e;
+                background-color: #a5283e;
             }
-            
+
             /* 輸入框樣式 */
             input {
                 font-size: 18px;
@@ -195,9 +196,9 @@
 
         <div id="logScreen" class="screen">
             <div class="topBar">
-              <button id="exportBtn" onclick="exportCSV()">Export</button>
-              <h2 id="title"></h2>
-              <button id="clearBtn" onclick="clearData()">Clear</button>
+                <button id="exportBtn" onclick="exportCSV()">Export</button>
+                <h2 id="title"></h2>
+                <button id="clearBtn" onclick="clearData()">Clear</button>
             </div>
             <div id="logList"></div>
             <button id="logButton" onclick="logTimestamp()">Log</button>
